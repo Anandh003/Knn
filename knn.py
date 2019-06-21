@@ -33,21 +33,21 @@ from matplotlib import pyplot as plt
 #     plt.xlabel(x_axis)
 #     plt.ylabel(y_axis)
 #     plt.title(title)
-    # plt.show()
+# plt.show()
 class Knn():
-    def __init__(self,data,groups=2):
+    def __init__(self, data, groups=2):
         self.clusters = groups
         self.feature = data
         self.rows = data.shape[0]
         self.columns = data.shape[1]
         self.centroids = data.sample(n=groups)
-        self.centroid_idx = pd.DataFrame(np.zeros((self.rows,1), dtype=int))
+        self.centroid_idx = pd.DataFrame(np.zeros((self.rows, 1), dtype=int))
 
     def fit(self):
         distances = np.zeros(self.rows, self.groups)
         for i in range(self.clusters):
             for j in range(self.rows):
-                distances[j,i] = math.sqrt(centroids[j:]) 
+                distances[j, i] = math.sqrt(centroids[j:])
 
 
 # def create_centroids():
