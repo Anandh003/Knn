@@ -13,18 +13,31 @@ class Knn():
         self.feature = data
         self.rows = data.shape[0]
         self.columns = data.shape[1]
-        self.centroids = random.sample(list(self.feature), groups)
-        self.previous_centroids = np.empty((groups, data.shape[1]))
+        np.random.shuffle(data)
+        self.centroids = data[0:groups,:]
+        self.previous_centroids = self.centroids[:]
         self.centroid_idx = np.zeros((self.rows, 1), dtype=int)
 
     def fit(self):
-        norms = self.find_distance()
-        self.centroid_idx = np.argmin(norms, axis=1)
-
+        limit = 0
+        plot_data = False
+        max_limit = 15
         if self.feature.shape[1] == 2:
+            plot_data = True
             self.plot2D_data()
-
-        centroid_means = self.find_mean()
+        i = 0
+        while(i <= max_limit):
+            i += 1     
+            norms = self.find_distance()
+            self.centroid_idx = np.argmin(norms, axis=1)
+            self.find_mean()
+            if plot_data:
+                self.plot2D_data()
+            if np.array_equal(self.previous_centroids,
+                              self.centroids) and limit >= 4:
+                limit += 1
+                break
+        print("Previous Centroids : ", self.previous_centroids)
 
     def find_distance(self):
         temp = np.zeros((self.rows, self.clusters))
@@ -35,22 +48,24 @@ class Knn():
         return temp
 
     def find_mean(self):
-        self.previous_centroids = self.centroids[:]
         for i in range(self.clusters):
             self.centroids[i] = np.mean(self.feature[self.centroid_idx == i],
-                                        axis=1)
-            print(self.centroids[i])
+                                        axis=0)
+        print(self.centroids)
+        self.previous_centroids = np.concatenate(
+                                    (self.previous_centroids, self.centroids)
+                                    )
+        return self.centroids
 
     def plot2D_data(self):
         plt.figure(1)
         plt.scatter(self.feature[:, 0], self.feature[:, 1],
                     c="red", s=15)
-        for i in range(self.clusters):
-            plt.scatter(self.centroids[i][0], self.centroids[i][1],
+        plt.scatter(self.centroids[:,0], self.centroids[:,1],
                         c="blue", alpha=0.8, marker="x", s=40)
-        plt.figure(2)
-        plt.hist(self.centroid_idx)
-        plt.show()
+        plt.draw()
+        plt.pause(1)
+        plt.clf()
 
 
 X = scipy.io.loadmat(os.path.join(os.getcwd(), "src", "ex7data2.mat"))
